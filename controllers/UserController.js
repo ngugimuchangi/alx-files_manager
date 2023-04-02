@@ -10,9 +10,9 @@ export default async function postNew(req, res) {
   const { email, password } = req.body;
   const usersCollection = dbClient.db.collection('users');
   res.statusCode = 400;
-  if (email === undefined) res.send('Missing email');
-  else if (password === undefined) res.send('Missing password');
-  else if (await usersCollection.findOne({ email })) res.send('Already exists');
+  if (email === undefined) res.send({ error: 'Missing email' });
+  else if (password === undefined) res.send({ error: 'Missing password' });
+  else if (await usersCollection.findOne({ email })) res.send({ error: 'Already exists' });
   else {
     const hashedPassword = crypto.createHash('sha1').update(password).digest('hex');
     const newUser = { email, password: hashedPassword };
