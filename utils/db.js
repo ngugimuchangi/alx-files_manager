@@ -5,9 +5,9 @@ class DBClient {
    * Initializes a new instance of DBClient
    */
   constructor() {
-    const HOST = process.env.DB_HOST ? process.env.DB_HOST : 'localhost';
-    const PORT = process.env.BD_PORT ? process.env.BD_PORT : 27017;
-    const DATABASE = process.env.DB_DATABASE ? process.env.DB_DATABASE : 'files_manager';
+    const HOST = process.env.DB_HOST || 'localhost';
+    const PORT = process.env.BD_PORT || 27017;
+    const DATABASE = process.env.DB_DATABASE || 'files_manager';
     const URI = `mongodb://${HOST}:${PORT}`;
     this.mongoClient = new MongoClient(URI, { useUnifiedTopology: true });
     this.mongoClient.connect((error) => {
