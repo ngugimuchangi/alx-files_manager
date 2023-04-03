@@ -9,10 +9,13 @@ import dbClient from '../utils/db';
 export default async function postNew(req, res) {
   const { email, password } = req.body;
   const usersCollection = dbClient.db.collection('users');
-  if (email === undefined) res.status(400).json({ error: 'Missing email' });
-  else if (password === undefined) res.status(400).json({ error: 'Missing password' });
-  else if (await usersCollection.findOne({ email })) res.status(400).json({ error: 'Already exists' });
-  else {
+  if (email === undefined) {
+    res.status(400).json({ error: 'Missing email' });
+  } else if (password === undefined) {
+    res.status(400).json({ error: 'Missing password' });
+  } else if (await usersCollection.findOne({ email })) {
+    res.status(400).json({ error: 'Already exists' });
+  } else {
     const hashedPassword = crypto.createHash('sha1').update(password).digest('hex');
     const newUser = { email, password: hashedPassword };
     const commandResult = await usersCollection.insertOne(newUser);
