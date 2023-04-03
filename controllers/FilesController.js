@@ -52,16 +52,18 @@ export async function postUpload(req, res) {
     res.status(400).json({ error: 'Parent is not a folder' });
     return;
   }
-  // Make main directory if does'nt exist
-  if (!fs.existsSync(filesDir)) {
+  // Make main directory if does'nt exist or isn't a directory
+  if (!fs.existsSync(filesDir) || !fs.lstatSync(filesDir).isDirectory()) {
     fs.mkdirSync(filesDir, { recursive: true });
   }
   // Create new folder if type is folder and add its details to db
   if (type === 'folder') {
+    const localPath = parentFolder ? `${filesDir}/${parentFolder.name}/${name}` : `${filesDir}/${name}`;
+    fs.mkdirSync(localPath, { recursive: true });
+    const parentIdObject = parentId || new ObjectId(parentId);
     const fileDocument = {
-      userId: new ObjectId(userId), name, type, isPublic, parentId,
+      userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject,
     };
-    fs.mkdirSync(`${filesDir}/${name}`, { recursive: true });
     const commandResult = await filesCollection.insertOne(fileDocument);
     res.status(201).json({
       id: commandResult.insertedId, userId, name, type, isPublic, parentId,
@@ -70,11 +72,12 @@ export async function postUpload(req, res) {
   }
   // Create new file if type is file or image and add its details to db
   const fileUuid = v4();
-  const localPath = parentFolder ? `${filesDir}/${parentFolder}/${fileUuid}`
+  const localPath = parentFolder ? `${filesDir}/${parentFolder.name}/${fileUuid}`
     : `${filesDir}/${fileUuid}`;
   fs.writeFileSync(localPath, Buffer.from(data, 'base64').toString('utf-8'));
+  const parentIdObject = parentId || new ObjectId(parentId);
   const fileDocument = {
-    userId: new ObjectId(userId), name, type, isPublic, parentId, localPath,
+    userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject,
   };
   const commandResult = await filesCollection.insertOne(fileDocument);
   res.status(201).json({
