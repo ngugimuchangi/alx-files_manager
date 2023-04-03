@@ -17,8 +17,11 @@ export async function getConnect(req, res) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  const credentials = authParams.split(' ', 1)[1];
-  const [email, password] = credentials.split(':', 1);
+  const b64Credentials = Buffer.from(authParams.replace('Basic', ''), 'base64');
+  const decryptedCredentials = b64Credentials.toString('ascii');
+  const credentials = decryptedCredentials.split(':');
+  const email = credentials[0] || '';
+  const password = credentials[1] || '';
   const userCollection = dbClient.db.collection('users');
   const user = userCollection.findOne({ email });
   if (!user) {
