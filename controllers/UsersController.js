@@ -19,6 +19,6 @@ export default async function postNew(req, res) {
     const hashedPassword = crypto.createHash('SHA1').update(password).digest('hex');
     const newUser = { email, password: hashedPassword };
     const commandResult = await usersCollection.insertOne(newUser);
-    res.status(200).json({ id: commandResult.insertedId, email });
+    res.status(201).json({ id: commandResult.insertedId, email });
   }
 }
