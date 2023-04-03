@@ -58,8 +58,8 @@ export async function getDisconnect(req, res) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  redisClient.del(token);
-  res.status(204);
+  await redisClient.del(`auth_${token}`);
+  res.status(204).json();
 }
 
 /**
