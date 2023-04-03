@@ -1,4 +1,4 @@
-import crypto from 'node:crypto';
+import crypto from 'crypto';
 import { v4 } from 'uuid';
 import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
