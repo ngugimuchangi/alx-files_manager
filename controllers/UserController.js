@@ -3,8 +3,8 @@ import dbClient from '../utils/db';
 
 /**
  * Controller for endpoint POST /users for creating new users
- * @param {object} req - request object
- * @param {object} res - response object
+ * @param {Object} req - request object
+ * @param {Object} res - response object
  */
 export default async function postNew(req, res) {
   const { email, password } = req.body;
