@@ -17,17 +17,20 @@ export async function getConnect(req, res) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
+  // Get base64 authentication parameters and decrypt to ascii
   const b64Credentials = Buffer.from(authParams.replace('Basic', ''), 'base64');
   const decryptedCredentials = b64Credentials.toString('ascii');
   const credentials = decryptedCredentials.split(':');
   const email = credentials[0] || '';
   const password = credentials[1] || '';
+  // Check if user exists
   const userCollection = dbClient.db.collection('users');
   const user = userCollection.findOne({ email });
   if (!user) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
+  // Check if passwords match
   const hashedPassword = crypto.createHash('SHA1').update(password).digest('hex');
   if (user.password !== hashedPassword) {
     res.status(401).json({ error: 'Unauthorized' });
