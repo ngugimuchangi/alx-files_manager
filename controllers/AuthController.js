@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import uuid from 'uuid';
+import { v4 } from 'uuid';
 import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
@@ -25,7 +25,7 @@ export async function getConnect(req, res) {
   const password = credentials[1] || '';
   // Check if user exists
   const userCollection = dbClient.db.collection('users');
-  const user = userCollection.findOne({ email });
+  const user = await userCollection.findOne({ email });
   if (!user) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
@@ -36,8 +36,8 @@ export async function getConnect(req, res) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  const token = uuid.v4();
-  await redisClient.set(`aut_${token}`, user._id.toString(), 60 * 60 * 24);
+  const token = v4();
+  await redisClient.set(`auth_${token}`, user._id.toString(), 60 * 60 * 24);
   res.status(200).json({ token });
 }
 
@@ -54,7 +54,7 @@ export async function getDisconnect(req, res) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  if (!await redisClient.get(token)) {
+  if (!await redisClient.get(`auth_${token}`)) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
@@ -75,12 +75,12 @@ export async function getMe(req, res) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  const userId = await redisClient.get(token);
+  const userId = await redisClient.get(`auth_${token}`);
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
   const userCollection = dbClient.db.collection('users');
-  const user = userCollection.findOne({ _id: new ObjectId(userId) });
+  const user = await userCollection.findOne({ _id: new ObjectId(userId) });
   res.status(200).json({ id: userId, email: user.email });
 }
