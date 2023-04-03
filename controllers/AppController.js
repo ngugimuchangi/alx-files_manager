@@ -8,8 +8,7 @@ import redisClient from '../utils/redis';
  */
 export function getStatus(_req, res) {
   if (dbClient.isAlive() && redisClient.isAlive()) {
-    res.statusCode = 200;
-    res.send({ redis: true, db: true });
+    res.status(200).json({ redis: true, db: true });
   }
 }
 
@@ -21,6 +20,5 @@ export function getStatus(_req, res) {
 export async function getStats(_req, res) {
   const users = await dbClient.nbUsers();
   const files = await dbClient.nbFiles();
-  res.statusCode = 200;
-  res.send({ users, files });
+  res.status(200).json({ users, files });
 }
