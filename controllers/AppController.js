@@ -4,7 +4,7 @@ import redisClient from '../utils/redis';
 /**
  * Controller for endpoint GET /status that retrieves
  * mongodb client and redis client connection status
- * @param {Object} _req - requests object
+ * @param {Object} _req - request object
  * @param {Object} res  - response object
  */
 export function getStatus(_req, res) {
@@ -16,7 +16,7 @@ export function getStatus(_req, res) {
 /**
  * Controller for endpoint GET /stats that retrieves
  * count of users and files
- * @param {Object} _req - requests object
+ * @param {Object} _req - request object
  * @param {Object} res  - response object
  */
 export async function getStats(_req, res) {
