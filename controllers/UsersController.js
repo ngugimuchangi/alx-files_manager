@@ -14,9 +14,9 @@ export default async function postNew(req, res) {
   } else if (password === undefined) {
     res.status(400).json({ error: 'Missing password' });
   } else if (await usersCollection.findOne({ email })) {
-    res.status(400).json({ error: 'Already exists' });
+    res.status(400).json({ error: 'Already exist' });
   } else {
-    const hashedPassword = crypto.createHash('sha1').update(password).digest('hex');
+    const hashedPassword = crypto.createHash('SHA1').update(password).digest('hex');
     const newUser = { email, password: hashedPassword };
     const commandResult = await usersCollection.insertOne(newUser);
     res.status(200).json({ id: commandResult.insertedId, email });
