@@ -19,7 +19,7 @@ export async function postUpload(req, res) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  // Validate token is valid
+  // Validate token is associated with a user
   const userId = await redisClient.get(`auth_${token}`);
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
@@ -33,7 +33,7 @@ export async function postUpload(req, res) {
     res.status(400).json({ error: 'Missing name' });
     return;
   }
-  if (!type || !fileTypes.includes(type)) {
+  if (!fileTypes.includes(type)) {
     res.status(400).json({ error: 'Missing type' });
     return;
   }
@@ -52,7 +52,7 @@ export async function postUpload(req, res) {
     res.status(400).json({ error: 'Parent is not a folder' });
     return;
   }
-  // Make main directory if does'nt exist or isn't a directory
+  // Make main directory if doesn't exist or isn't a directory
   if (!fs.existsSync(filesDir) || !fs.lstatSync(filesDir).isDirectory()) {
     fs.mkdirSync(filesDir, { recursive: true });
   }
@@ -62,7 +62,7 @@ export async function postUpload(req, res) {
     fs.mkdirSync(localPath, { recursive: true });
     const parentIdObject = parentId === 0 ? parentId
       : new ObjectId(parentId); const fileDocument = {
-      userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject,
+      userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject, localPath,
     };
     const commandResult = await filesCollection.insertOne(fileDocument);
     res.status(201).json({
