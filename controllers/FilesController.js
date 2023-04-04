@@ -86,12 +86,14 @@ export async function postUpload(req, res) {
  * @param {Object} res - response object
  */
 export async function getShow(req, res) {
+  // Token validation
   const token = req.get('X-Token');
   const userId = await redisClient.get(`auth_${token}`);
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
+  // Request params retrieval and conversion to ObjectIds
   const { id } = req.params;
   const _id = ObjectId.isValid(id) ? new ObjectId(id) : id;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
@@ -112,6 +114,7 @@ export async function getShow(req, res) {
  * @param {Object} res - response object
  */
 export async function getIndex(req, res) {
+  const MAX_PAGE_SIZE = 20;
   const token = req.get('X-Token');
   const userId = await redisClient.get(`auth_${token}`);
   if (!userId) {
@@ -120,14 +123,17 @@ export async function getIndex(req, res) {
   }
   const { parentId = 0, page = 0 } = req.query;
   const filesCollection = dbClient.db.collection('files');
+  // Convert id query parameters to ObjectIds
   const _parentId = parentId && ObjectId.isValid(parentId) ? new ObjectId(parentId) : parentId;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
+  // Check if page number is valid
   const _page = /^\d+$/.test(page) ? parseInt(page, 10) : 0;
+  // Pipeline for aggregation operation
   const pipeline = [
     { $match: { parentId: _parentId, userId: _userId } },
     { $sort: { _id: -1 } },
-    { $skip: _page * 20 },
-    { $limit: 20 },
+    { $skip: _page * MAX_PAGE_SIZE },
+    { $limit: MAX_PAGE_SIZE },
   ];
   const files = await filesCollection.aggregate(pipeline).toArray();
   const formattedResponse = files.map((document) => formatFileDocument(document));
@@ -141,6 +147,7 @@ export async function getIndex(req, res) {
  * @param {Object} res - response object
  */
 export async function putPublish(req, res) {
+  // Token validation
   const token = req.get('X-Token');
   const userId = await redisClient.get(`auth_${token}`);
   if (!userId) {
@@ -148,6 +155,7 @@ export async function putPublish(req, res) {
     return;
   }
   const { id } = req.params;
+  // Convert request id params to ObjectIds
   const _id = ObjectId.isValid(id) ? new ObjectId(id) : id;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
   const filesCollection = dbClient.db.collection('files');
@@ -169,15 +177,19 @@ export async function putPublish(req, res) {
  * @param {Object} res - response object
  */
 export async function putUnpublish(req, res) {
+  // Token validation
   const token = req.get('X-Token');
   const userId = await redisClient.get(`auth_${token}`);
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
+  // Query params retrieval and conversion
   const { id } = req.params;
   const filesCollection = dbClient.db.collection('files');
+  // Search filter
   const updateFilter = { _id: new ObjectId(id), userId: new ObjectId(userId) };
+  // Update parameters
   const updateOperation = { $set: { isPublic: false } };
   const commandResult = await filesCollection.updateOne(updateFilter, updateOperation);
   if (commandResult.matchedCount) {
