@@ -11,7 +11,7 @@ import redisClient from '../utils/redis';
  */
 export async function postUpload(req, res) {
   const filesDir = process.env.FOLDER_PATH || '/tmp/file_manager';
-  const fileTypes = ['folder', 'file', 'images'];
+  const fileTypes = ['folder', 'file', 'image'];
   const filesCollection = dbClient.db.collection('files');
   const token = req.get('X-Token');
   // Validate token has passed in the headers
@@ -60,8 +60,8 @@ export async function postUpload(req, res) {
   if (type === 'folder') {
     const localPath = parentFolder ? `${filesDir}/${parentFolder.name}/${name}` : `${filesDir}/${name}`;
     fs.mkdirSync(localPath, { recursive: true });
-    const parentIdObject = parentId || new ObjectId(parentId);
-    const fileDocument = {
+    const parentIdObject = parentId === 0 ? parentId
+      : new ObjectId(parentId); const fileDocument = {
       userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject,
     };
     const commandResult = await filesCollection.insertOne(fileDocument);
@@ -75,7 +75,7 @@ export async function postUpload(req, res) {
   const localPath = parentFolder ? `${filesDir}/${parentFolder.name}/${fileUuid}`
     : `${filesDir}/${fileUuid}`;
   fs.writeFileSync(localPath, Buffer.from(data, 'base64').toString('utf-8'));
-  const parentIdObject = parentId || new ObjectId(parentId);
+  const parentIdObject = parentId === 0 ? parentId : new ObjectId(parentId);
   const fileDocument = {
     userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject,
   };
