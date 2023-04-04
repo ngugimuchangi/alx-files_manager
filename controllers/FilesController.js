@@ -94,9 +94,8 @@ export async function getShow(req, res) {
   }
   userId = new ObjectId(userId);
   const { id } = req.params;
-  console.log(id);
   const filesCollection = dbClient.db.collection('files');
-  const file = await filesCollection.findOne({ _id: new ObjectId(id) });
+  const file = await filesCollection.findOne({ _id: new ObjectId(id), userId });
   if (!file) {
     res.status(404).json({ error: 'Not found' });
     return;
