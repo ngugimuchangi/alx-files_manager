@@ -122,7 +122,7 @@ export async function getIndex(req, res) {
   const filesCollection = dbClient.db.collection('files');
   const _parentId = parentId && ObjectId.isValid(parentId) ? new ObjectId(parentId) : parentId;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
-  const _page = /^\d+$/.test(page) ? Number.parseInt(page, 10) : 0;
+  const _page = /^\d+$/.test(page) ? parseInt(page, 10) : 0;
   const pipeline = [
     { $match: { parentId: _parentId, userId: _userId } },
     { $skip: _page * 20 },
