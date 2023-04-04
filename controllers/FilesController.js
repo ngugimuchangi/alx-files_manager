@@ -87,7 +87,8 @@ export async function postUpload(req, res) {
  */
 export async function getShow(req, res) {
   const token = req.get('X-Token');
-  if (!token || !await redisClient.get(`auth_${token}`)) {
+  const userId = await redisClient.get(`auth_${token}`);
+  if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
@@ -95,7 +96,7 @@ export async function getShow(req, res) {
   const filesCollection = dbClient.db.collection('files');
   let file;
   try {
-    file = await filesCollection.findOne({ _id: new ObjectId(id) });
+    file = await filesCollection.findOne({ _id: new ObjectId(id), userId });
   } catch (_error) {
     res.status(404).json({ error: 'Not found' });
     return;
@@ -112,7 +113,8 @@ export async function getShow(req, res) {
  */
 export async function getIndex(req, res) {
   const token = req.get('X-Token');
-  if (!token || !await redisClient.get(`auth_${token}`)) {
+  let userId = await redisClient.get(`auth_${token}`);
+  if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
@@ -120,9 +122,10 @@ export async function getIndex(req, res) {
   const { page = 0 } = req.query;
   const filesCollection = dbClient.db.collection('files');
   parentId = parentId ? new ObjectId(parentId) : 0;
-  await filesCollection.createIndex({ parentId: -1 });
+  userId = new ObjectId(userId);
+  await filesCollection.createIndex({ parentId: -1, userId: -1 });
   const pipeline = [
-    { $match: { parentId } },
+    { $match: { parentId, userId } },
     { $skip: page * 20 },
     { $limit: 20 },
   ];
