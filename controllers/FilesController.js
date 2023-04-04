@@ -197,10 +197,8 @@ export async function getFile(req, res) {
   const userId = await redisClient.get(`auth_${token}`);
   const { id } = req.params;
   const filesCollection = dbClient.db.collection('files');
-  let fileDocument;
-  try {
-    fileDocument = await filesCollection.findOne({ _id: new ObjectId(id) });
-  } catch (_error) {
+  const fileDocument = await filesCollection.findOne({ _id: new ObjectId(id) });
+  if (!fileDocument) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
