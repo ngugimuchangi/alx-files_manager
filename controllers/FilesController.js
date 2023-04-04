@@ -201,10 +201,16 @@ export async function getFile(req, res) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
-  if (!fileDocument.isPublic) {
+  if (!userId && !fileDocument.isPublic) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
+
+  if (userId && fileDocument.userId.toString() !== userId) {
+    res.status(404).json({ error: 'Not found' });
+    return;
+  }
+
   if (fileDocument.type === 'folder') {
     res.status(400).json({ error: "A folder doesn't have content" });
     return;
