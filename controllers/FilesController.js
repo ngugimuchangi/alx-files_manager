@@ -190,10 +190,6 @@ export async function putUnpublish(req, res) {
 export async function getFile(req, res) {
   const token = req.get('X-Token');
   const userId = await redisClient.get(`auth_${token}`);
-  if (!userId) {
-    res.status(404).json({ error: 'Not found' });
-    return;
-  }
   const { id } = req.params;
   const filesCollection = dbClient.db.collection('files');
   const fileDocument = await filesCollection.findOne({ _id: new ObjectId(id) });
