@@ -43,12 +43,12 @@ export async function postUpload(req, res) {
     return;
   }
   // Validate parent folder exists in db, its type is a folder
-  const parentFolder = await filesCollection.findOne({ _id: new ObjectId(parentId) });
-  if (parentId && !parentFolder) {
+  const parentDocument = await filesCollection.findOne({ _id: new ObjectId(parentId) });
+  if (parentId && !parentDocument) {
     res.status(400).json({ error: 'Parent not found' });
     return;
   }
-  if (parentId && parentFolder.type !== 'folder') {
+  if (parentId && parentDocument.type !== 'folder') {
     res.status(400).json({ error: 'Parent is not a folder' });
     return;
   }
@@ -58,8 +58,8 @@ export async function postUpload(req, res) {
   }
   // Create new folder if type is folder and add its details to db
   if (type === 'folder') {
-    const localPath = parentFolder ? `${filesDir}/${parentFolder.name}/${name}` : `${filesDir}/${name}`;
-    fs.mkdirSync(localPath, { recursive: true });
+    // const localPath = parentDocument ? `${filesDir}/${parentDocument.name}/${name}` : `${filesDir}/${name}`;
+    // fs.mkdirSync(localPath, { recursive: true });
     const parentIdObject = parentId === 0 ? parentId : new ObjectId(parentId);
     const fileDocument = {
       userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject,
@@ -72,8 +72,7 @@ export async function postUpload(req, res) {
   }
   // Create new file if type is file or image and add its details to db
   const fileUuid = v4();
-  const localPath = parentFolder ? `${filesDir}/${parentFolder.name}/${fileUuid}`
-    : `${filesDir}/${fileUuid}`;
+  const localPath = `${filesDir}/${fileUuid}`;
   fs.writeFileSync(localPath, Buffer.from(data, 'base64').toString('utf-8'));
   const parentIdObject = parentId === 0 ? parentId : new ObjectId(parentId);
   const fileDocument = {
