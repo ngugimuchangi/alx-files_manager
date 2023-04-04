@@ -87,15 +87,16 @@ export async function postUpload(req, res) {
  */
 export async function getShow(req, res) {
   const token = req.get('X-Token');
-  let userId = await redisClient.get(`auth_${token}`);
+  const userId = await redisClient.get(`auth_${token}`);
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  userId = new ObjectId(userId);
   const { id } = req.params;
+  const _id = ObjectId.isValid(id) ? new ObjectId(id) : id;
+  const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
   const filesCollection = dbClient.db.collection('files');
-  const file = await filesCollection.findOne({ _id: new ObjectId(id), userId });
+  const file = await filesCollection.findOne({ _id, userId: _userId });
   if (!file) {
     res.status(404).json({ error: 'Not found' });
     return;
@@ -112,19 +113,19 @@ export async function getShow(req, res) {
  */
 export async function getIndex(req, res) {
   const token = req.get('X-Token');
-  let userId = await redisClient.get(`auth_${token}`);
+  const userId = await redisClient.get(`auth_${token}`);
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  let { parentId = 0 } = req.query;
-  const { page = 0 } = req.query;
-  parentId = parentId ? new ObjectId(parentId) : 0;
+  const { parentId = 0, page = 0 } = req.query;
   const filesCollection = dbClient.db.collection('files');
-  userId = new ObjectId(userId);
+  const _parentId = parentId && ObjectId.isValid(parentId) ? new ObjectId(parentId) : parentId;
+  const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
+  const _page = /^\d+$/.test(page) ? Number.parseInt(page, 10) : 0;
   const pipeline = [
-    { $match: { parentId, userId } },
-    { $skip: page * 20 },
+    { $match: { parentId: _parentId, userId: _userId } },
+    { $skip: _page * 20 },
     { $limit: 20 },
   ];
   const files = await filesCollection.aggregate(pipeline).toArray();
@@ -146,8 +147,10 @@ export async function putPublish(req, res) {
     return;
   }
   const { id } = req.params;
+  const _id = ObjectId.isValid(id) ? new ObjectId(id) : id;
+  const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
   const filesCollection = dbClient.db.collection('files');
-  const updateFilter = { _id: new ObjectId(id), userId: new ObjectId(userId) };
+  const updateFilter = { _id, userId: _userId };
   const updateOperation = { $set: { isPublic: true } };
   const commandResult = await filesCollection.updateOne(updateFilter, updateOperation);
   if (commandResult.matchedCount) {
