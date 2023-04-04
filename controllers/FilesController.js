@@ -120,12 +120,12 @@ export async function getIndex(req, res) {
   }
   let { parentId = 0 } = req.query;
   const { page = 0 } = req.query;
-  const filesCollection = dbClient.db.collection('files');
   parentId = parentId ? new ObjectId(parentId) : 0;
+  const filesCollection = dbClient.db.collection('files');
   userId = new ObjectId(userId);
   await filesCollection.createIndex({ parentId: -1, userId: -1 });
   const pipeline = [
-    { $match: { parentId, userId } },
+    { $match: { parentId } },
     { $skip: page * 20 },
     { $limit: 20 },
   ];
