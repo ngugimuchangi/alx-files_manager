@@ -87,17 +87,17 @@ export async function postUpload(req, res) {
  */
 export async function getShow(req, res) {
   const token = req.get('X-Token');
-  const userId = await redisClient.get(`auth_${token}`);
+  let userId = await redisClient.get(`auth_${token}`);
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
+  userId = new ObjectId(userId);
   const { id } = req.params;
-  const filesCollection = dbClient.db.collection('files');
-  let file;
-  try {
-    file = await filesCollection.findOne({ _id: new ObjectId(id), userId });
-  } catch (_error) {
+  console.log(id);
+  const filesCollection = dbClient.db.collection('files', userId);
+  const file = await filesCollection.findOne({ _id: new ObjectId(id) });
+  if (!file) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
