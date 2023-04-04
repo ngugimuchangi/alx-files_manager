@@ -60,9 +60,9 @@ export async function postUpload(req, res) {
   if (type === 'folder') {
     const localPath = parentFolder ? `${filesDir}/${parentFolder.name}/${name}` : `${filesDir}/${name}`;
     fs.mkdirSync(localPath, { recursive: true });
-    const parentIdObject = parentId === 0 ? parentId
-      : new ObjectId(parentId); const fileDocument = {
-      userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject, localPath,
+    const parentIdObject = parentId === 0 ? parentId : new ObjectId(parentId);
+    const fileDocument = {
+      userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject,
     };
     const commandResult = await filesCollection.insertOne(fileDocument);
     res.status(201).json({
@@ -77,7 +77,7 @@ export async function postUpload(req, res) {
   fs.writeFileSync(localPath, Buffer.from(data, 'base64').toString('utf-8'));
   const parentIdObject = parentId === 0 ? parentId : new ObjectId(parentId);
   const fileDocument = {
-    userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject,
+    userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject, localPath,
   };
   const commandResult = await filesCollection.insertOne(fileDocument);
   res.status(201).json({
