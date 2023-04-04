@@ -216,6 +216,6 @@ export async function getFile(req, res) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
-  res.append('Content-Type', mime.contentType(fileDocument.name));
+  res.append('Content-Type', mime.lookup(fileDocument.name));
   res.sendFile(fileDocument.localPath);
 }
