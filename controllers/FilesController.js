@@ -199,12 +199,11 @@ export async function getFile(req, res) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
-  if (!userId && !fileDocument.isPublic) {
+  if (!fileDocument.isPublic && !userId) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
-
-  if (userId && fileDocument.userId.toString() !== userId) {
+  if (!fileDocument.isPublic && fileDocument.userId.toString() !== userId) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
