@@ -124,7 +124,7 @@ export async function getIndex(req, res) {
   const filesCollection = dbClient.db.collection('files');
   userId = new ObjectId(userId);
   const pipeline = [
-    { $match: { parentId, userId } },
+    { $match: { parentId } },
     { $skip: page * 20 },
     { $limit: 20 },
   ];
