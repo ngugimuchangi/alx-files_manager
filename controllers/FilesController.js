@@ -93,8 +93,10 @@ export async function getShow(req, res) {
   }
   const { id } = req.params;
   const filesCollection = dbClient.db.collection('files');
-  const file = filesCollection.findOne({ _id: new ObjectId(id) });
-  if (!file) {
+  let file;
+  try {
+    file = await filesCollection.findOne({ _id: new ObjectId(id) });
+  } catch (_error) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
@@ -216,6 +218,6 @@ export async function getFile(req, res) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
-  res.append('Content-Type', mime.lookup(fileDocument.name));
+  res.append('Content-Type', mime.contentType(fileDocument.name));
   res.sendFile(fileDocument.localPath);
 }
