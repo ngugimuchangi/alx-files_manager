@@ -125,6 +125,7 @@ export async function getIndex(req, res) {
   const _page = /^\d+$/.test(page) ? parseInt(page, 10) : 0;
   const pipeline = [
     { $match: { parentId: _parentId, userId: _userId } },
+    { $sort: { _id: -1 } },
     { $skip: _page * 20 },
     { $limit: 20 },
   ];
