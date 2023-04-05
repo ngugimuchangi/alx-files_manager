@@ -12,7 +12,7 @@ const userQueue = Queue('send welcome email');
  */
 export default async function postNew(req, res) {
   const { email, password } = req.body;
-  const usersCollection = dbClient.db.collection('users');
+  const usersCollection = dbClient.usersCollection();
   if (email === undefined) {
     res.status(400).json({ error: 'Missing email' });
   } else if (password === undefined) {

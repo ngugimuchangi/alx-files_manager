@@ -24,7 +24,7 @@ export async function getConnect(req, res) {
   const email = credentials[0] || '';
   const password = credentials[1] || '';
   // Check if user exists
-  const userCollection = dbClient.db.collection('users');
+  const userCollection = dbClient.usersCollection();
   const user = await userCollection.findOne({ email });
   if (!user) {
     res.status(401).json({ error: 'Unauthorized' });
@@ -80,7 +80,7 @@ export async function getMe(req, res) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  const userCollection = dbClient.db.collection('users');
+  const userCollection = dbClient.usersCollection();
   const user = await userCollection.findOne({ _id: new ObjectId(userId) });
   res.status(200).json({ id: userId, email: user.email });
 }

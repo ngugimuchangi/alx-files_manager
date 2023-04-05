@@ -18,7 +18,7 @@ const fileQueue = Queue('thumbnail generation');
 export async function postUpload(req, res) {
   const filesDir = process.env.FOLDER_PATH || '/tmp/file_manager';
   const fileTypes = ['folder', 'file', 'image'];
-  const filesCollection = dbClient.db.collection('files');
+  const filesCollection = dbClient.filesCollection();
   // Validate token
   const token = req.get('X-Token');
   const userId = await redisClient.get(`auth_${token}`);
@@ -107,7 +107,7 @@ export async function getShow(req, res) {
   const { id } = req.params;
   const _id = ObjectId.isValid(id) ? new ObjectId(id) : id;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
-  const filesCollection = dbClient.db.collection('files');
+  const filesCollection = dbClient.filesCollection();
   const file = await filesCollection.findOne({ _id, userId: _userId });
   if (!file) {
     res.status(404).json({ error: 'Not found' });
@@ -132,7 +132,7 @@ export async function getIndex(req, res) {
     return;
   }
   const { parentId = 0, page = 0 } = req.query;
-  const filesCollection = dbClient.db.collection('files');
+  const filesCollection = dbClient.filesCollection();
   // Convert id query parameters to ObjectIds
   let _parentId;
   if (parentId === '0') {
@@ -174,7 +174,7 @@ export async function putPublish(req, res) {
   // Convert request id params to ObjectIds
   const _id = ObjectId.isValid(id) ? new ObjectId(id) : id;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
-  const filesCollection = dbClient.db.collection('files');
+  const filesCollection = dbClient.filesCollection();
   const updateFilter = { _id, userId: _userId };
   const updateOperation = { $set: { isPublic: true } };
   const commandResult = await filesCollection.updateOne(updateFilter, updateOperation);
@@ -202,7 +202,7 @@ export async function putUnpublish(req, res) {
   }
   // Query params retrieval and conversion
   const { id } = req.params;
-  const filesCollection = dbClient.db.collection('files');
+  const filesCollection = dbClient.filesCollection();
   // Search filter
   const updateFilter = { _id: new ObjectId(id), userId: new ObjectId(userId) };
   // Update parameters
@@ -228,7 +228,7 @@ export async function getFile(req, res) {
   const userId = await redisClient.get(`auth_${token}`);
   const { id } = req.params;
   const { size } = req.query;
-  const filesCollection = dbClient.db.collection('files');
+  const filesCollection = dbClient.filesCollection();
   const fileDocument = await filesCollection.findOne({ _id: new ObjectId(id) });
   if (!fileDocument) {
     res.status(404).json({ error: 'Not found' });

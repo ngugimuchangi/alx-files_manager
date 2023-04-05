@@ -42,6 +42,22 @@ class DBClient {
     const numberOfFiles = filesCollection.countDocuments();
     return numberOfFiles;
   }
+
+  /**
+   * Retrieves users collection from database
+   * @returns {Object} - users collection object
+   */
+  usersCollection() {
+    return this.db.collection('users');
+  }
+
+  /**
+   * Retrieves files collection from database
+   * @returns {Object} - files collection object
+   */
+  filesCollection() {
+    return this.db.collection('files');
+  }
 }
 
 const dbClient = new DBClient();
