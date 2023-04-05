@@ -7,6 +7,7 @@ import dbClient from './utils/db';
 const fileQueue = Queue('thumbnail generation');
 const userQueue = Queue('send welcome email');
 
+// Thumbnail jobs consumer
 fileQueue.process(async (job) => {
   const { fileId, userId } = job.data;
   // job essential properties validation
@@ -38,6 +39,7 @@ fileQueue.on('completed', (job, result) => {
   console.log(`Thumbnail generation job #${job.id} completed: ${result}`);
 });
 
+// Email jobs consumer
 userQueue.process(async (job) => {
   const { userId } = job.data;
   if (!userId) throw new Error('Missing userId');
