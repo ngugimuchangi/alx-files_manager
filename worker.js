@@ -8,7 +8,7 @@ const fileQueue = Queue('thumbnail generation');
 const userQueue = Queue('send welcome email');
 
 // Thumbnail jobs consumer
-fileQueue.process(async (job) => {
+fileQueue.process(10, async (job) => {
   const { fileId, userId } = job.data;
   // job essential properties validation
   if (!fileId) throw new Error('Missing fileId');
@@ -41,7 +41,7 @@ fileQueue.on('completed', (job, result) => {
 });
 
 // Email jobs consumer
-userQueue.process(async (job) => {
+userQueue.process(20, async (job) => {
   const { userId } = job.data;
   if (!userId) throw new Error('Missing userId');
   const userCollection = dbClient.usersCollection();
