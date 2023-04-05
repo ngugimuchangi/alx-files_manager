@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import request from 'request';
 
 /**
- * Test cases for AppController.js and endpoints:
+ * Test cases for AppController.js endpoints:
  * 1. GET /status
  * 2. GET /stats
  */
