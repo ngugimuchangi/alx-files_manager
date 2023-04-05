@@ -5,6 +5,7 @@ import imageThumbnail from 'image-thumbnail';
 import dbClient from './utils/db';
 
 const fileQueue = Queue('thumbnail generation');
+const userQueue = Queue('send welcome email');
 
 fileQueue.process(async (job) => {
   const { fileId, userId } = job.data;
@@ -35,4 +36,18 @@ fileQueue.process(async (job) => {
 
 fileQueue.on('completed', (job, result) => {
   console.log(`Thumbnail generation job #${job.id} completed: ${result}`);
+});
+
+userQueue.process(async (job) => {
+  const { userId } = job.data;
+  if (!userId) throw new Error('Missing userId');
+  const userCollection = dbClient.db.collection('users');
+  const _id = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
+  const user = await userCollection.findOne({ _id });
+  if (!user) throw new Error('User not found');
+  return Promise.resolve(`Welcome ${user.email}`);
+});
+
+userQueue.on('completed', (_job, result) => {
+  console.log(result);
 });
