@@ -13,6 +13,7 @@ fileQueue.process(async (job) => {
   // job essential properties validation
   if (!fileId) throw new Error('Missing fileId');
   if (!userId) throw new Error('Missing userId');
+
   // file id and user id conversion to ObjectId before querying db
   const filesCollection = dbClient.filesCollection();
   const _id = ObjectId.isValid(fileId) ? new ObjectId(fileId) : fileId;
