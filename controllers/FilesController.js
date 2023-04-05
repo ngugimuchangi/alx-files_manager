@@ -12,6 +12,8 @@ const fileQueue = Queue('thumbnail generation');
 
 /**
  * Controller for POST /files endpoint for handling file creation
+ * @typedef {import("express").Request} Request
+ * @typedef {import("express").Response} Response
  * @param {import("express").Request} req - request object
  * @param {import("express").Response} res - response object
  */
@@ -92,8 +94,8 @@ export async function postUpload(req, res) {
 /**
  * Controller for GET /files/:id that retrieves files
  * by their ids
- * @param {import("express").Request} req - request object
- * @param {import("express").Response} res - response object
+ * @param {Request} req - request object
+ * @param {Response} res - response object
  */
 export async function getShow(req, res) {
   // Token validation
@@ -120,8 +122,8 @@ export async function getShow(req, res) {
 /**
  * Controller for GET /files endpoint that returns
  * all files of a logged in user
- * @param {import("express").Request} req - request object
- * @param {import("express").Response} res - response object
+ * @param {Request} req - request object
+ * @param {Response} res - response object
  */
 export async function getIndex(req, res) {
   const MAX_PAGE_SIZE = 20;
@@ -159,8 +161,8 @@ export async function getIndex(req, res) {
 /**
  * Controller for GET /files/:id/publish endpoint that updates
  * file document's isPublic field to true
- * @param {import("express").Request} req - request object
- * @param {import("express").Response} res - response object
+ * @param {Request} req - request object
+ * @param {Response} res - response object
  */
 export async function putPublish(req, res) {
   // Token validation
@@ -189,8 +191,8 @@ export async function putPublish(req, res) {
 /**
  * Controller for GET /files/:id/unpublish endpoint that updates
  * file document's isPublic field to false
- * @param {import("express").Request} req - request object
- * @param {import("express").Response} res - response object
+ * @param {Request} req - request object
+ * @param {Response} res - response object
  */
 export async function putUnpublish(req, res) {
   // Token validation
@@ -219,8 +221,8 @@ export async function putUnpublish(req, res) {
 /**
  * Controller for /GET /files/:id/data endpoint that retrieves
  * data associated with a file
- * @param {import("express").Request} req - request object
- * @param {import("express").Response} res - response object
+ * @param {Request} req - request object
+ * @param {Response} res - response object
  */
 export async function getFile(req, res) {
   const IMG_SIZES = ['500', '250', '100'];

@@ -7,8 +7,10 @@ const userQueue = Queue('send welcome email');
 
 /**
  * Controller for endpoint POST /users for creating new users
- * @param {import("express").Request} req - request object
- * @param {import("express").Response} res - response object
+ * @typedef {import("express").Request} Request
+ * @typedef {import("express").Response} Response
+ * @param {Request} req - request object
+ * @param {Response} res - response object
  */
 export default async function postNew(req, res) {
   const { email, password } = req.body;

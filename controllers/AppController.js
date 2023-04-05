@@ -4,8 +4,10 @@ import redisClient from '../utils/redis';
 /**
  * Controller for endpoint GET /status that retrieves
  * mongodb client and redis client connection status
- * @param {import("express").Request} _req - request object
- * @param {import("express").Response} res  - response object
+ * @typedef {import("express").Request} Request
+ * @typedef {import("express").Response} Response
+ * @param {Request} _req - request object
+ * @param {Response} res  - response object
  */
 export function getStatus(_req, res) {
   if (dbClient.isAlive() && redisClient.isAlive()) {
@@ -16,8 +18,8 @@ export function getStatus(_req, res) {
 /**
  * Controller for endpoint GET /stats that retrieves
  * count of users and files
- * @param {import("express").Request} _req - request object
- * @param {import("express").Response} res  - response object
+ * @param {Request} _req - request object
+ * @param {Response} res  - response object
  */
 export async function getStats(_req, res) {
   const users = await dbClient.nbUsers();
