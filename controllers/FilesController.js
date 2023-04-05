@@ -93,7 +93,7 @@ export async function postUpload(req, res) {
 
 /**
  * Controller for GET /files/:id that retrieves files
- * by their ids
+ * information by their ids
  * @param {Request} req - request object
  * @param {Response} res - response object
  */
@@ -110,12 +110,12 @@ export async function getShow(req, res) {
   const _id = ObjectId.isValid(id) ? new ObjectId(id) : id;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
   const filesCollection = dbClient.filesCollection();
-  const file = await filesCollection.findOne({ _id, userId: _userId });
-  if (!file) {
+  const fileDocument = await filesCollection.findOne({ _id, userId: _userId });
+  if (!fileDocument) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
-  const formattedResponse = formatFileDocument(file);
+  const formattedResponse = formatFileDocument(fileDocument);
   res.status(200).json(formattedResponse);
 }
 
@@ -142,19 +142,20 @@ export async function getIndex(req, res) {
   } else {
     _parentId = parentId && ObjectId.isValid(parentId) ? new ObjectId(parentId) : parentId;
   }
-
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
+
   // Check if page number is valid
   const _page = /^\d+$/.test(page) ? parseInt(page, 10) : 0;
+
   // Pipeline for aggregation operation
   const pipeline = [
     { $match: { parentId: _parentId, userId: _userId } },
-    { $sort: { _id: -1 } },
+    { $sort: { _id: 1 } },
     { $skip: _page * MAX_PAGE_SIZE },
     { $limit: MAX_PAGE_SIZE },
   ];
-  const files = await filesCollection.aggregate(pipeline).toArray();
-  const formattedResponse = files.map((document) => formatFileDocument(document));
+  const fileDocuments = await (await filesCollection.aggregate(pipeline)).toArray();
+  const formattedResponse = fileDocuments.map((document) => formatFileDocument(document));
   res.status(200).json(formattedResponse);
 }
 
