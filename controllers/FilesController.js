@@ -1,10 +1,14 @@
 import fs from 'fs';
 import mime from 'mime-types';
-import { ObjectId } from 'mongodb';
 import { v4 } from 'uuid';
+import Queue from 'bull';
+import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 import formatFileDocument from '../utils/format';
+
+// Thumbnail generating queue
+const fileQueue = Queue('thumbnail generation');
 
 /**
  * Controller for POST /files endpoint for handling file creation
@@ -68,12 +72,18 @@ export async function postUpload(req, res) {
   // Create new file if type is file or image and add its details to db
   const fileUuid = v4();
   const localPath = `${filesDir}/${fileUuid}`;
-  fs.writeFileSync(localPath, Buffer.from(data, 'base64').toString('utf-8'));
+  fs.writeFileSync(localPath, Buffer.from(data, 'base64'));
   const parentIdObject = parentId === 0 ? parentId : new ObjectId(parentId);
   const fileDocument = {
     userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject, localPath,
   };
   const commandResult = await filesCollection.insertOne(fileDocument);
+  // Add thumbnail job to queue
+  if (type === 'image') {
+    const jobData = { fileId: commandResult.insertedId, userId };
+    fileQueue.add(jobData);
+  }
+  // Response
   res.status(201).json({
     id: commandResult.insertedId, userId, name, type, isPublic, parentId,
   });
@@ -207,9 +217,11 @@ export async function putUnpublish(req, res) {
  * @param {Object} res - response object
  */
 export async function getFile(req, res) {
+  const IMG_SIZES = ['500', '250', '100'];
   const token = req.get('X-Token');
   const userId = await redisClient.get(`auth_${token}`);
   const { id } = req.params;
+  const { size } = req.query;
   const filesCollection = dbClient.db.collection('files');
   const fileDocument = await filesCollection.findOne({ _id: new ObjectId(id) });
   if (!fileDocument) {
@@ -229,10 +241,14 @@ export async function getFile(req, res) {
     res.status(400).json({ error: "A folder doesn't have content" });
     return;
   }
-  if (!fs.existsSync(fileDocument.localPath)) {
+  let filePath = fileDocument.localPath;
+  if (fileDocument.type === 'image' && IMG_SIZES.includes(size)) {
+    filePath = `${filePath}_${size}`;
+  }
+  if (!fs.existsSync(filePath)) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
   res.append('Content-Type', mime.contentType(fileDocument.name));
-  res.sendFile(fileDocument.localPath);
+  res.sendFile(filePath);
 }
