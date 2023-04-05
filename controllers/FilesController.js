@@ -14,8 +14,8 @@ const fileQueue = Queue('thumbnail generation');
  * Controller for POST /files endpoint for handling file creation
  * @typedef {import("express").Request} Request
  * @typedef {import("express").Response} Response
- * @param {import("express").Request} req - request object
- * @param {import("express").Response} res - response object
+ * @param {Request} req - request object
+ * @param {Response} res - response object
  */
 export async function postUpload(req, res) {
   const filesDir = process.env.FOLDER_PATH || '/tmp/file_manager';
