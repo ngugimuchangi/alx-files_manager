@@ -134,7 +134,13 @@ export async function getIndex(req, res) {
   const { parentId = 0, page = 0 } = req.query;
   const filesCollection = dbClient.db.collection('files');
   // Convert id query parameters to ObjectIds
-  const _parentId = parentId && ObjectId.isValid(parentId) ? new ObjectId(parentId) : parentId;
+  let _parentId;
+  if (parentId === '0') {
+    _parentId = 0;
+  } else {
+    _parentId = parentId && ObjectId.isValid(parentId) ? new ObjectId(parentId) : parentId;
+  }
+
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
   // Check if page number is valid
   const _page = /^\d+$/.test(page) ? parseInt(page, 10) : 0;
