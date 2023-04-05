@@ -7,8 +7,8 @@ import redisClient from '../utils/redis';
 /**
  * Controller for GET /connect endpoint for authorizing users
  * using Basic Auth scheme
- * @param {Object} req - request object
- * @param {Object} res - response object
+ * @param {import("express").Request} req - request object
+ * @param {import("express").Response} res - response object
  * @returns {void}
  */
 export async function getConnect(req, res) {
@@ -44,8 +44,8 @@ export async function getConnect(req, res) {
 /**
  * Controller for GET /disconnect endpoint that logs out user
  * if they were logged in.
- * @param {Object} req - request object
- * @param {Object} res - response object
+ * @param {import("express").Request} req - request object
+ * @param {import("express").Response} res - response object
  * @returns {void}
  */
 export async function getDisconnect(req, res) {
@@ -65,8 +65,8 @@ export async function getDisconnect(req, res) {
 /**
  * Controller for GET /users/me endpoint that retrieves information
  * about a logged in user
- * @param {Object} req - request object
- * @param {Object} res - response object
+ * @param {import("express").Request} req - request object
+ * @param {import("express").Response} res - response object
  * @returns {void}
  */
 export async function getMe(req, res) {

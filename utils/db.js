@@ -45,7 +45,7 @@ class DBClient {
 
   /**
    * Retrieves users collection from database
-   * @returns {Object} - users collection object
+   * @returns {import("mongodb").Collection} - users collection object
    */
   usersCollection() {
     return this.db.collection('users');
@@ -53,7 +53,7 @@ class DBClient {
 
   /**
    * Retrieves files collection from database
-   * @returns {Object} - files collection object
+   * @returns {import("mongodb").Collection} - files collection object
    */
   filesCollection() {
     return this.db.collection('files');

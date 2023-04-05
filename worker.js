@@ -14,7 +14,7 @@ fileQueue.process(async (job) => {
   if (!fileId) throw new Error('Missing fileId');
   if (!userId) throw new Error('Missing userId');
   // file id and user id conversion to ObjectId before querying db
-  const filesCollection = dbClient.db.collection('files');
+  const filesCollection = dbClient.filesCollection();
   const _id = ObjectId.isValid(fileId) ? new ObjectId(fileId) : fileId;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
   const file = await filesCollection.findOne({ _id, userId: _userId });
@@ -43,7 +43,7 @@ fileQueue.on('completed', (job, result) => {
 userQueue.process(async (job) => {
   const { userId } = job.data;
   if (!userId) throw new Error('Missing userId');
-  const userCollection = dbClient.db.collection('users');
+  const userCollection = dbClient.usersCollection();
   const _id = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
   const user = await userCollection.findOne({ _id });
   if (!user) throw new Error('User not found');
