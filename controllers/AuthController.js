@@ -9,7 +9,6 @@ import redisClient from '../utils/redis';
  * using Basic Auth scheme
  * @param {import("express").Request} req - request object
  * @param {import("express").Response} res - response object
- * @returns {void}
  */
 export async function getConnect(req, res) {
   const authParams = req.get('Authorization');
@@ -46,7 +45,6 @@ export async function getConnect(req, res) {
  * if they were logged in.
  * @param {import("express").Request} req - request object
  * @param {import("express").Response} res - response object
- * @returns {void}
  */
 export async function getDisconnect(req, res) {
   const token = req.get('X-Token');
@@ -67,7 +65,6 @@ export async function getDisconnect(req, res) {
  * about a logged in user
  * @param {import("express").Request} req - request object
  * @param {import("express").Response} res - response object
- * @returns {void}
  */
 export async function getMe(req, res) {
   const token = req.get('X-Token');
