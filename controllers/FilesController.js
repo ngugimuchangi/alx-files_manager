@@ -133,15 +133,10 @@ export async function getIndex(req, res) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  const { parentId = 0, page = 0 } = req.query;
+  const { parentId = '0', page = 0 } = req.query;
   const filesCollection = dbClient.filesCollection();
   // Convert id query parameters to ObjectIds
-  let _parentId;
-  if (parentId === '0') {
-    _parentId = 0;
-  } else {
-    _parentId = parentId && ObjectId.isValid(parentId) ? new ObjectId(parentId) : parentId;
-  }
+  const _parentId = parentId && ObjectId.isValid(parentId) ? new ObjectId(parentId) : parentId;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
 
   // Check if page number is valid
