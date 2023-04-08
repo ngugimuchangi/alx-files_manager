@@ -13,11 +13,13 @@ const { expect, request } = chai;
  * 2. GET /stats
  */
 describe('App controller tests', () => {
+  let client;
+  let db;
   const DB_HOST = process.env.DB_HOST || 'localhost';
   const DB_PORT = process.env.BD_PORT || 27017;
   const DATABASE = process.env.DB_DATABASE || 'files_manager';
-  let client;
-  let db;
+  const users = [];
+  const files = [];
   const randomString = () => Math.random().toString(16).substring(2);
 
   before(() => new Promise((resolve) => {
@@ -25,8 +27,6 @@ describe('App controller tests', () => {
     client = new MongoClient(`mongodb://${DB_HOST}:${DB_PORT}`, { useUnifiedTopology: true });
     client.connect(async (error, client) => {
       if (error) throw error;
-      const users = [];
-      const files = [];
 
       // Clear user and files collections
       db = client.db(DATABASE);

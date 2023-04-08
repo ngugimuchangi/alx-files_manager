@@ -21,7 +21,7 @@ describe('Authentication controller tests', () => {
   let db;
   let rdClient;
   let asyncSet;
-  let asyncGet;
+  let asyncKeys;
   let asyncDel;
   const DB_HOST = process.env.DB_HOST || 'localhost';
   const DB_PORT = process.env.BD_PORT || 27017;
@@ -46,7 +46,7 @@ describe('Authentication controller tests', () => {
       // Connect to redis and clear keys
       rdClient = createClient();
       asyncSet = promisify(rdClient.set).bind(rdClient);
-      asyncGet = promisify(rdClient.get).bind(rdClient);
+      asyncKeys = promisify(rdClient.keys).bind(rdClient);
       asyncDel = promisify(rdClient.del).bind(rdClient);
       rdClient.on('connect', async () => {
         await asyncSet(`auth_${token}`, commandResults.insertedId.toString());
@@ -62,7 +62,10 @@ describe('Authentication controller tests', () => {
     await dbClient.close();
 
     // Clear redis keys and close connection
-    await asyncDel(`auth_${token}`);
+    const keys = await asyncKeys('auth_*');
+    for (const key of keys) {
+      await asyncDel(key);
+    }
     rdClient.quit();
   });
 
