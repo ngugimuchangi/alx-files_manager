@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import sha1 from 'sha1';
 import { v4 } from 'uuid';
 import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
@@ -30,7 +30,7 @@ export async function getConnect(req, res) {
     return;
   }
   // Check if passwords match
-  const hashedPassword = crypto.createHash('SHA1').update(password).digest('hex');
+  const hashedPassword = sha1(password);
   if (user.password !== hashedPassword) {
     res.status(401).json({ error: 'Unauthorized' });
     return;

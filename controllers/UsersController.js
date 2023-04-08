@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import sha1 from 'sha1';
 import Queue from 'bull';
 import dbClient from '../utils/db';
 
@@ -22,7 +22,7 @@ export default async function postNew(req, res) {
   } else if (await usersCollection.findOne({ email })) {
     res.status(400).json({ error: 'Already exist' });
   } else {
-    const hashedPassword = crypto.createHash('SHA1').update(password).digest('hex');
+    const hashedPassword = sha1(password);
     const newUser = { email, password: hashedPassword };
     const commandResult = await usersCollection.insertOne(newUser);
     userQueue.add({ userId: commandResult.insertedId });
