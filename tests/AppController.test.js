@@ -1,8 +1,11 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { ObjectId, MongoClient } from 'mongodb';
+import { MongoClient } from 'mongodb';
 import sha1 from 'sha1';
 import app from '../server';
+
+chai.use(chaiHttp);
+
 
 /**
  * Test cases for AppController.js endpoints:
@@ -10,7 +13,6 @@ import app from '../server';
  * 2. GET /stats
  */
 describe('app controller tests', () => {
-  chai.use(chaiHttp);
   const { expect } = chai;
   const { request } = chai;
   const DB_HOST = process.env.DB_HOST || 'localhost';
