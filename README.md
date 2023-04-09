@@ -42,7 +42,7 @@ The API's documentation is available at [here](./documentation)
 Specify different `DB_DATABASE` and `FOLDER_PATH` environment when running test to avoid data loss in main database and folder
 - Run specific test
 ```
-DB_DATABASE='api_database' FOLDER_PATH=''npm test tests/test_file.js
+DB_DATABASE='test_database' FOLDER_PATH='test_folder'npm test tests/test_file.js
 ```
 - Run all tests
 ```
