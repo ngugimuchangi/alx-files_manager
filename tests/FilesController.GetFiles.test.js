@@ -28,6 +28,7 @@ describe('fileController.js tests - File info and data retrieval endpoints', () 
   const DB_PORT = process.env.BD_PORT || 27017;
   const DATABASE = process.env.DB_DATABASE || 'files_manager';
   const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
+  const MAX_PAGE_SIZE = 20;
   const initialPassword = 'supersecretFYI';
   const hashedPassword = sha1(initialPassword);
   const userOne = { _id: new ObjectId(), email: 'tester@mail.com', password: hashedPassword };
@@ -37,6 +38,7 @@ describe('fileController.js tests - File info and data retrieval endpoints', () 
   const userOneTokenKey = `auth_${userOneToken}`;
   const userTwoTokenKey = `auth_${userTwoToken}`;
 
+  const folders = [];
   const files = [];
   const randomString = () => Math.random().toString(32).substring(2);
 
@@ -52,8 +54,8 @@ describe('fileController.js tests - File info and data retrieval endpoints', () 
       await db.collection('users').insertMany([userOne, userTwo]);
 
       // Add files to db
-      for (let i = 0; i < 25; i++) {
-        const newFile = {
+      for (let i = 0; i < 10; i += 1) {
+        const newFolder = {
           _id: new ObjectId(),
           name: randomString(),
           type: 'folder',
@@ -61,22 +63,35 @@ describe('fileController.js tests - File info and data retrieval endpoints', () 
           userId: (userOne._id),
           isPublic: !!(i % 2),
         };
-        files.push(newFile);
+        folders.push(newFolder);
       }
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 25; i += 1) {
         const newFile = {
           _id: new ObjectId(),
-          name: randomString(),
+          name: `${randomString()}.txt`,
           type: 'file',
-          parentId: files[0]._id,
+          parentId: folders[0]._id,
           userId: userOne._id,
           isPublic: !!(i % 2),
+          localPath: `${FOLDER_PATH}/${v4()}`,
         };
         files.push(newFile);
       }
+      await db.collection('files').insertMany(folders);
       await db.collection('files').insertMany(files);
 
-      // Connect to redis and clear keys
+      // Write data for testing
+      const publicFile = files.find((file) => file.isPublic === true);
+      const privateFile = files.find((file) => file.isPublic === false);
+      const publicData = 'Hello World';
+      const privateData = 'This is private';
+      if (!fs.existsSync(FOLDER_PATH)) {
+        fs.mkdirSync(FOLDER_PATH);
+      }
+      fs.writeFileSync(publicFile.localPath, publicData);
+      fs.writeFileSync(privateFile.localPath, privateData);
+
+      // Connect to redis and set authentication tokens
       rdClient = createClient();
       asyncSet = promisify(rdClient.set).bind(rdClient);
       asyncKeys = promisify(rdClient.keys).bind(rdClient);
@@ -100,10 +115,12 @@ describe('fileController.js tests - File info and data retrieval endpoints', () 
     await dbClient.close();
 
     // Clear redis keys and close connection
-    const keys = await asyncKeys('auth_*');
-    for (const key of keys) {
-      await asyncDel(key);
+    const tokens = await asyncKeys('auth_*');
+    const deleteKeysOperations = [];
+    for (const key of tokens) {
+      deleteKeysOperations.push(asyncDel(key));
     }
+    await Promise.all(deleteKeysOperations);
     rdClient.quit();
   });
 
@@ -147,39 +164,23 @@ describe('fileController.js tests - File info and data retrieval endpoints', () 
   });
 
   describe('GET /files/:id/data', () => {
-    it('should fetch data of specified file', () => new Promise((done) => {
-      const fileUpload = {
-        name: `${randomString()}.txt`,
-        type: 'file',
-        parentId: files[0]._id.toString(),
-        userId: userOne._id.toString(),
-        isPublic: true,
-        data: Buffer.from('Hello World').toString('base64'),
-      };
-      request(app)
-        .post('/files')
+    it('should fetch data of specified file', (done) => {
+      const file = files.find((file) => file.isPublic === true );
+       request(app)
+        .get(`/files/${file._id.toString()}/data`)
         .set('X-Token', userOneToken)
-        .send(fileUpload)
         .end((error, res) => {
           expect(error).to.be.null;
-          expect(res).to.have.status(201);
-          files.push(res.body);
-          request(app)
-            .get(`/files/${res.body.id}/data`)
-            .set('X-Token', userOneToken)
-            .end((error, res) => {
-              expect(error).to.be.null;
-              expect(res).to.have.status(200);
-              expect(res.text).to.equal('Hello World');
-              done();
-            });
+          expect(res).to.have.status(200);
+          expect(res.text).to.equal('Hello World');
+          done();
         });
-    }));
+    });
 
     it('should allow cross-user file access as long as the files are public', () => {
-      const file = files[files.length - 1];
+      const file = files.find((file) => file.isPublic === true);
       request(app)
-        .get(`/files/${file.id}/data`)
+        .get(`/files/${file._id.toString()}/data`)
         .set('X-Token', userTwoToken)
         .end((error, res) => {
           expect(error).to.be.null;
@@ -188,10 +189,22 @@ describe('fileController.js tests - File info and data retrieval endpoints', () 
         });
     });
 
-    it('should reject request for files that do not belong to user and is not public', (done) => {
-      const file = files[files.length - 3];
+    it('should allow user to view personal private files', () => {
+      const file = files.find((file) => file.isPublic === false);
+      request(app)
+        .get(`/files/${file._id.toString()}/data`)
+        .set('X-Token', userOneToken)
+        .end((error, res) => {
+          expect(error).to.be.null;
+          expect(res).to.have.status(200);
+          expect(res.text).to.equal('This is private');
+        });
+    });
+
+    it('should reject request for private files that do not belong to user', (done) => {
+      const file = files.find((file) => file.isPublic === false);
        request(app)
-        .get(`/files/${file._id}/data`)
+        .get(`/files/${file._id.toString()}/data`)
         .set('X-Token', userTwoToken)
         .end((error, res) => {
           expect(error).to.be.null;
@@ -202,9 +215,9 @@ describe('fileController.js tests - File info and data retrieval endpoints', () 
     });
 
     it('should reject request for files that are folders', (done) => {
-      const file = files[0];
+      const folder = folders[0];
       request(app)
-        .get(`/files/${file._id}/data`)
+        .get(`/files/${folder._id}/data`)
         .set('X-Token', userOneToken)
         .end((error, res) => {
           expect(error).to.be.null;
@@ -216,10 +229,66 @@ describe('fileController.js tests - File info and data retrieval endpoints', () 
   });
 
   describe('GET /files', () => {
-    it('should fetch files when parentId is not provide i.e. implicit ParentId=0', () => {});
-    it('should fetch files when parentId=0 i.e. explicit ParentId=0', () => {});
-    it('should fetch files when correct, non-zero parentId is provided', () => {});
-    it('should fetch second page when correct, non-zero parentId is provided', () => {});
-    it('should return an empty list when page is out of index', () => {});
+    it('should fetch files without query parameters parentId and page i.e. implicit ParentId=0 and page=0', () => {
+      request(app)
+        .get('/files')
+        .set('X-Token', userOneToken)
+        .end((error, res) => {
+          expect(error).to.be.null;
+          expect(res.body).to.be.an('Array').with.lengthOf(10);
+        });
+    });
+    it('should fetch files when parentId= 0 and page=0 i.e. explicit ParentId=0 and page=0', () => {
+      request(app)
+        .get('/files')
+        .set('X-Token', userOneToken)
+        .query({ parentId: '0', page: 0 })
+        .end((error, res) => {
+          expect(error).to.be.null;
+          expect(res.body).to.be.an('Array').with.lengthOf(10);
+        });
+    });
+    it('should fetch files when correct, non-zero parentId is provided', () => {
+      request(app)
+        .get('/files')
+        .set('X-Token', userOneToken)
+        .query({ parentId: folders[0]._id.toString(), page: 0 })
+        .end((error, res) => {
+          expect(error).to.be.null;
+          expect(res.body).to.be.an('Array').with.lengthOf(MAX_PAGE_SIZE);
+        });
+    });
+    it('should fetch second page when correct, non-zero parentId is provided', () => {
+      request(app)
+        .get('/files')
+        .set('X-Token', userOneToken)
+        .query({ parentId: folders[0]._id.toString(), page: 1 })
+        .end((error, res) => {
+          expect(error).to.be.null;
+          expect(res.body).to.be.an('Array').with.lengthOf(5);
+        });
+    });
+
+    it('should return an empty list when page is out of index', () => {
+      request(app)
+        .get('/files')
+        .set('X-Token', userOneToken)
+        .query({ parentId: folders[0]._id, page: 2 })
+        .end((error, res) => {
+          expect(error).to.be.null;
+          expect(res.body).to.be.an('Array').with.lengthOf(0);
+        });
+    });
+
+    it('should return an empty list when user has no files', () => {
+      request(app)
+        .get('/files')
+        .set('X-Token', userTwoToken)
+        .query({ parentId: '0', page: 0 })
+        .end((error, res) => {
+          expect(error).to.be.null;
+          expect(res.body).to.be.an('Array').with.lengthOf(0);
+        });
+    });
   });
 });
