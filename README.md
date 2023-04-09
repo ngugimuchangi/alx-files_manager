@@ -14,7 +14,7 @@ git clone https://github.com/ngugimuchangi/alx-files_manager.git
 Install required dependencies
 ```
 cd alx-files_manager
-$npm install
+npm install
 ```
 
 Start worker
