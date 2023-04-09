@@ -16,7 +16,7 @@ describe('Authentication controller tests', () => {
   const DB_HOST = process.env.DB_HOST || 'localhost';
   const DB_PORT = process.env.BD_PORT || 27017;
   const DATABASE = process.env.DB_DATABASE || 'files_manager';
-  const user = { email: 'tester@mail.com', password: 'supersecret' };
+  const user = { email: 'tester@mail.com', password: 'supersecretFYI' };
 
   before(() => new Promise((resolve) => {
     // Connect to db and clear collections
