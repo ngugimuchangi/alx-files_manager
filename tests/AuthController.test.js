@@ -62,10 +62,12 @@ describe('Authentication controller tests', () => {
     await dbClient.close();
 
     // Clear redis keys and close connection
-    const keys = await asyncKeys('auth_*');
-    for (const key of keys) {
-      await asyncDel(key);
+    const tokens = await asyncKeys('auth_*');
+    const deleteKeysOperations = [];
+    for (const key of tokens) {
+      deleteKeysOperations.push(asyncDel(key));
     }
+    await Promise.all(deleteKeysOperations);
     rdClient.quit();
   });
 
