@@ -17,7 +17,7 @@ const { expect, request } = chai;
   * 2. GET /files/:id
   * 3. GET /files:id/data
   */
-describe('fileController.js tests - File info and data retrieval endpoints', () => {
+describe('FileController.js tests - File info and data retrieval endpoints', () => {
   let dbClient;
   let db;
   let rdClient;

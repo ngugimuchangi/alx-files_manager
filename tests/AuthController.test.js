@@ -16,7 +16,7 @@ const { expect, request } = chai;
  * 2. GET /disconnect
  * 3. GET /users/me
  */
-describe('Authentication controller tests', () => {
+describe('AuthController.js tests', () => {
   let dbClient;
   let db;
   let rdClient;

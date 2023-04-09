@@ -12,7 +12,7 @@ const { expect, request } = chai;
  * Test cases for UsersController.js endpoint:
  * 1. POST /users
  */
-describe('Authentication controller tests', () => {
+describe('UserController.js tests', () => {
   let dbClient;
   let db;
   let rdClient;
