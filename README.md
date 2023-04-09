@@ -27,9 +27,27 @@ Start express server
 npm run start-server
 ```
 
+## Environment
+Environment variables you can adjust when running the express server
+- `PORT`: express server's port
+- `DB_HOST`: mongodb's server host address
+- `DB_PORT`: mongodb's port
+- `DB_DATABASE`: database to use
+- `FOLDER_PATH`: folder to store files
+
 ## Documentation
 The API's documentation is available at [here](./documentation)
 
+## Tests
+Specify different `DB_DATABASE` and `FOLDER_PATH` environment when running test to avoid data loss in main database and folder
+- Run specific test
+```
+DB_DATABASE='api_database' FOLDER_PATH=''npm test tests/test_file.js
+```
+- Run all tests
+```
+DB_DATABASE='api_database' FOLDER_PATH=''npm run test-all
+```
 ## Authors
 - [Duncan Ngugi](https://github.com/ngugimuchangi)
 - [Samule Ekati](https://github.com/Samuthe)
