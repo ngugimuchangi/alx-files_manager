@@ -31,6 +31,7 @@ export async function postUpload(req, res) {
   const {
     name, type, parentId = 0, isPublic = false, data,
   } = req.body;
+  const _parentId = parentId && ObjectId.isValid(parentId) ? new ObjectId(parentId) : parentId;
   // Validate name and type are okay
   if (!name) {
     res.status(400).json({ error: 'Missing name' });
@@ -46,20 +47,19 @@ export async function postUpload(req, res) {
     return;
   }
   // Validate parent folder exists in db, its type is a folder
-  const parentDocument = await filesCollection.findOne({ _id: new ObjectId(parentId) });
-  if (parentId && !parentDocument) {
+  const parentDocument = await filesCollection.findOne({ _id: _parentId });
+  if (_parentId && !parentDocument) {
     res.status(400).json({ error: 'Parent not found' });
     return;
   }
-  if (parentId && parentDocument.type !== 'folder') {
+  if (_parentId && parentDocument.type !== 'folder') {
     res.status(400).json({ error: 'Parent is not a folder' });
     return;
   }
   // Store folder details in db
   if (type === 'folder') {
-    const parentIdObject = parentId === 0 ? parentId : new ObjectId(parentId);
     const fileDocument = {
-      userId: new ObjectId(userId), name, type, isPublic, parentId: parentIdObject,
+      userId: new ObjectId(userId), name, type, isPublic, parentId: _parentId,
     };
     const commandResult = await filesCollection.insertOne(fileDocument);
     res.status(201).json({
@@ -173,7 +173,9 @@ export async function putPublish(req, res) {
   const _id = ObjectId.isValid(id) ? new ObjectId(id) : id;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
   const filesCollection = dbClient.filesCollection();
+  // Search filers
   const updateFilter = { _id, userId: _userId };
+  // Update parameters
   const updateOperation = { $set: { isPublic: true } };
   const commandResult = await filesCollection.updateOne(updateFilter, updateOperation);
   if (commandResult.matchedCount) {
@@ -200,9 +202,12 @@ export async function putUnpublish(req, res) {
   }
   // Query params retrieval and conversion
   const { id } = req.params;
+  const _id = ObjectId.isValid(id) ? new ObjectId(id) : id;
+  const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
   const filesCollection = dbClient.filesCollection();
+
   // Search filter
-  const updateFilter = { _id: new ObjectId(id), userId: new ObjectId(userId) };
+  const updateFilter = { _id, userId: _userId };
   // Update parameters
   const updateOperation = { $set: { isPublic: false } };
   const commandResult = await filesCollection.updateOne(updateFilter, updateOperation);
