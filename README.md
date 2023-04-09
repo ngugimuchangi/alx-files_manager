@@ -33,7 +33,7 @@ Environment variables you can adjust when running the express server
 - `DB_HOST`: mongodb's server host address
 - `DB_PORT`: mongodb's port
 - `DB_DATABASE`: database to use
-- `FOLDER_PATH`: folder to store files
+- `FOLDER_PATH`: absolute path to folder to store files
 
 ## Documentation
 The API's documentation is available at [here](./documentation)
@@ -42,11 +42,11 @@ The API's documentation is available at [here](./documentation)
 Specify different `DB_DATABASE` and `FOLDER_PATH` environment when running test to avoid data loss in main database and folder
 - Run specific test
 ```
-DB_DATABASE='test_database' FOLDER_PATH='test_folder'npm test tests/test_file.js
+DB_DATABASE='test_database' FOLDER_PATH='/test_folder'npm test tests/test_file.js
 ```
 - Run all tests
 ```
-DB_DATABASE='api_database' FOLDER_PATH=''npm run test-all
+DB_DATABASE='test_database' FOLDER_PATH='/test_folder'npm run test-all
 ```
 ## Authors
 - [Duncan Ngugi](https://github.com/ngugimuchangi)
