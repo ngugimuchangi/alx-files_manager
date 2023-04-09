@@ -125,6 +125,8 @@ router.get('/disconnect', getDisconnect);
  * @apiName PostFile
  * @apiGroup Files
  * @apiDescription Upload a new file or folder to the API.
+ * Three thumbnails of the file are generated when the files is uploaded.
+ * The thumbnails' widths are `100`, `250` and `500`
  * @apiUse XToken
  * @apiUse Unauthorized
  * @apiBody {String} name Filename
@@ -157,6 +159,7 @@ router.post('/files', postUpload);
  * @apiUse Unauthorized
  * @apiUse NotFound
  * @apiParam {String} id Files unique ID
+ * @apiQuery {Number=100, 250, 500} [size] Specific file size to retrieve.
  * @apiSuccessExample Success-Example:
  *  HTTP/1.1 200 OK
  *  {
