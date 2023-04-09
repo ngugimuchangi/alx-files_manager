@@ -12,6 +12,9 @@
         "test": "./node_modules/.bin/mocha --require @babel/register --exit"
     },
     "author": "Duncan Ngugi",
+    "contributors": [
+        "Samuel Ekati"
+    ],
     "license": "ISC",
     "dependencies": {
         "body-parser": "^1.20.2",
