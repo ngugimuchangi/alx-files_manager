@@ -5,7 +5,7 @@ Simple file management API that allows users to:
 - Download the files
 - Share uploaded files with other users
 
-# How to Run
+## How to Run
 Clone the repo
 ```
 git clone https://github.com/ngugimuchangi/alx-files_manager.git
@@ -27,9 +27,9 @@ Start express server
 npm run start-server
 ```
 
-# Documentation
+## Documentation
 The API's documentation is available at [here](./documentation)
 
-# Authors
+## Authors
 - [Duncan Ngugi](https://github.com/ngugimuchangi)
 - [Samule Ekati](https://github.com/Samuthe)
