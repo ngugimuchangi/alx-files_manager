@@ -39,10 +39,10 @@ Environment variables you can adjust when running the express server
 The API's documentation is available at [here](./documentation)
 
 ## Tests
-Specify different `DB_DATABASE` and `FOLDER_PATH` environment when running test to avoid data loss in main database and folder
+Specify different `DB_DATABASE` and `FOLDER_PATH` environment when running test to avoid data loss in main database and folder. Check out [test](tests/) folder for unit tests.
 - Run specific test
 ```
-DB_DATABASE='test_database' FOLDER_PATH='/tmp/test_folder' npm test tests/test_file.js
+DB_DATABASE='test_database' FOLDER_PATH='/tmp/test_folder' npm test tests/testFile.js
 ```
 - Run all tests
 ```
