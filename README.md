@@ -19,7 +19,7 @@ npm install
 
 Start worker
 ```
-nmp run start-worker
+npm run start-worker
 ```
 
 Start express server
