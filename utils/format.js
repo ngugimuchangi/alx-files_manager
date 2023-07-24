@@ -14,7 +14,12 @@ export default function formatFileDocument(document) {
   userId = userId.toString();
   parentId = parentId instanceof ObjectId ? parentId.toString() : parentId;
   const formattedResponseDocument = {
-    id, userId, name, type, isPublic, parentId,
+    id,
+    userId,
+    name,
+    type,
+    isPublic,
+    parentId,
   };
   return formattedResponseDocument;
 }
