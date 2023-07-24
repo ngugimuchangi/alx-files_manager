@@ -1,4 +1,5 @@
 import dbClient from '../utils/db';
+import Stats from '../utils/stats';
 import redisClient from '../utils/redis';
 
 class AppController {
@@ -19,13 +20,18 @@ class AppController {
   /**
    * Controller for endpoint GET /stats that retrieves
    * count of users and files
-   * @param {Request} _req - request object
-   * @param {Response} res  - response object
+   * @param {Request} _req - Request object
+   * @param {Response} res  - Response object
+   * @param {import("express").NextFunction} next - Next function
    */
-  static async getStats(_req, res) {
-    const users = await dbClient.nbUsers();
-    const files = await dbClient.nbFiles();
-    res.status(200).json({ users, files });
+  static async getStats(_req, res, next) {
+    try {
+      const users = await Stats.nbUsers();
+      const files = await Stats.nbFiles();
+      res.status(200).json({ users, files });
+    } catch (err) {
+      next(err);
+    }
   }
 }
 
