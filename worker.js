@@ -1,8 +1,9 @@
 import Queue from 'bull';
 import { ObjectId } from 'mongodb';
-import fs from 'fs';
 import imageThumbnail from 'image-thumbnail';
-import dbClient from './utils/db';
+import generateThumbnail from './utils/thumbnails';
+import UsersCollection from './utils/users';
+import FilesCollection from './utils/files';
 
 const fileQueue = Queue('thumbnail generation');
 const userQueue = Queue('send welcome email');
@@ -15,24 +16,19 @@ fileQueue.process(10, async (job) => {
   if (!userId) throw new Error('Missing userId');
 
   // file id and user id conversion to ObjectId before querying db
-  const filesCollection = dbClient.filesCollection();
   const _id = ObjectId.isValid(fileId) ? new ObjectId(fileId) : fileId;
   const _userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
-  const file = await filesCollection.findOne({ _id, userId: _userId });
+  const file = await FilesCollection.getFile({ _id, userId: _userId });
+  const { localPath } = file;
 
   // Check if file exists in db and local storage
   if (!file) throw new Error('File not found');
-  if (!fs.existsSync(file.localPath)) throw (new Error('File not found'));
 
-  // Create thumbnails
-  const thumbnail100 = await imageThumbnail(file.localPath, { width: 100 });
-  const thumbnail250 = await imageThumbnail(file.localPath, { width: 250 });
-  const thumbnail500 = await imageThumbnail(file.localPath, { width: 500 });
-
-  // Save thumbnails to local storage
-  fs.writeFileSync(`${file.localPath}_100`, thumbnail100);
-  fs.writeFileSync(`${file.localPath}_250`, thumbnail250);
-  fs.writeFileSync(`${file.localPath}_500`, thumbnail500);
+  // Create thumbnails and store them in local storage
+  const thumbnail100 = generateThumbnail(localPath, 100);
+  const thumbnail250 = imageThumbnail(localPath, 250);
+  const thumbnail500 = imageThumbnail(localPath, 500);
+  await Promise.all([thumbnail100, thumbnail250, thumbnail500]);
   return Promise.resolve(`Thumbnails for ${file.name} created successfully.`);
 });
 
@@ -44,9 +40,8 @@ fileQueue.on('completed', (job, result) => {
 userQueue.process(20, async (job) => {
   const { userId } = job.data;
   if (!userId) throw new Error('Missing userId');
-  const userCollection = dbClient.usersCollection();
   const _id = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
-  const user = await userCollection.findOne({ _id });
+  const user = await UsersCollection.getUser({ _id });
   if (!user) throw new Error('User not found');
   return Promise.resolve(`Welcome ${user.email}`);
 });
