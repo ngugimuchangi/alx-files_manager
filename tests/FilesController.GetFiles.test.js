@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import sha1 from 'sha1';
@@ -73,7 +74,7 @@ describe('FileController.js tests - File info and data retrieval endpoints', () 
           parentId: folders[0]._id,
           userId: userOne._id,
           isPublic: !!(i % 2),
-          localPath: `${FOLDER_PATH}/${v4()}`,
+          localPath: path.join(FOLDER_PATH, v4()),
         };
         files.push(newFile);
       }
@@ -109,7 +110,7 @@ describe('FileController.js tests - File info and data retrieval endpoints', () 
     fs.rmdirSync(FOLDER_PATH, { recursive: true });
 
     // Clear db collections
-    await db.collection('users').deleteMany({ });
+    await db.collection('users').deleteMany({});
     await db.collection('files').deleteMany({});
     await db.dropDatabase();
     await dbClient.close();
@@ -165,8 +166,8 @@ describe('FileController.js tests - File info and data retrieval endpoints', () 
 
   describe('GET /files/:id/data', () => {
     it('should fetch data of specified file', (done) => {
-      const file = files.find((file) => file.isPublic === true );
-       request(app)
+      const file = files.find((file) => file.isPublic === true);
+      request(app)
         .get(`/files/${file._id.toString()}/data`)
         .set('X-Token', userOneToken)
         .end((error, res) => {
@@ -203,7 +204,7 @@ describe('FileController.js tests - File info and data retrieval endpoints', () 
 
     it('should reject request for private files that do not belong to user', (done) => {
       const file = files.find((file) => file.isPublic === false);
-       request(app)
+      request(app)
         .get(`/files/${file._id.toString()}/data`)
         .set('X-Token', userTwoToken)
         .end((error, res) => {
