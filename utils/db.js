@@ -24,39 +24,19 @@ class DBClient {
   }
 
   /**
-   * Queries 'users' collection
-   * @returns {number} - number of documents in users collection
-   */
-  async nbUsers() {
-    const usersCollection = this.db.collection('users');
-    const numberOfUsers = await usersCollection.countDocuments();
-    return numberOfUsers;
-  }
-
-  /**
-   * Queries 'files' collection
-   * @returns {number} - number of documents in files collection
-   */
-  async nbFiles() {
-    const filesCollection = this.db.collection('files');
-    const numberOfFiles = filesCollection.countDocuments();
-    return numberOfFiles;
-  }
-
-  /**
-   * Retrieves users collection from database
+   * Retrieves specified collection from database
    * @returns {import("mongodb").Collection} - users collection object
    */
-  usersCollection() {
-    return this.db.collection('users');
+  getCollection(collectionName) {
+    const collection = this.db.collection(collectionName);
+    return collection;
   }
 
   /**
-   * Retrieves files collection from database
-   * @returns {import("mongodb").Collection} - files collection object
+   * Closes connection to mongodb client
    */
-  filesCollection() {
-    return this.db.collection('files');
+  async closeConnection() {
+    await this.mongoClient.close();
   }
 }
 
