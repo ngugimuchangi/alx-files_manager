@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import AuthController from '../controllers/AuthController';
 import UsersController from '../controllers/UsersController';
+import authenticateToken from '../middleware/auth';
 
 const usersRouter = Router();
+usersRouter.use('/users/me', authenticateToken);
 
 /**
  * @apiDefine XToken

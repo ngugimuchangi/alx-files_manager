@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import AuthController from '../controllers/AuthController';
+import authenticateToken from '../middleware/auth';
 
 const authRouter = Router();
+
+authRouter.use('/disconnect', authenticateToken);
 
 /**
  * @apiDefine XToken

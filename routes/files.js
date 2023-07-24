@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import FilesController from '../controllers/FilesController';
+import authenticateToken from '../middleware/auth';
 
 const filesRouter = Router();
+filesRouter.use(authenticateToken);
 
 /**
  * @apiDefine XToken
