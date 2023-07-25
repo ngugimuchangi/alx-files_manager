@@ -35,7 +35,7 @@ class DBClient {
   /**
    * Closes connection to mongodb client
    */
-  async closeConnection() {
+  async close() {
     await this.mongoClient.close();
   }
 }
