@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 import dbClient from './db';
 
 const FILE_TYPES = ['folder', 'file', 'image'];
-const FILES_DIR = process.env.FOLDER_PATH || '/tmp/file_manager';
+const FILES_DIR = process.env.FOLDER_PATH || '/tmp/files_manager';
 
 // Utility class for files database operations
 class FilesCollection {
