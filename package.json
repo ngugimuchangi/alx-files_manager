@@ -8,6 +8,7 @@
     "check-lint": "lint [0-9]*.js",
     "start-server": "nodemon --exec babel-node --presets @babel/preset-env ./server.js",
     "start-worker": "nodemon --exec babel-node --presets @babel/preset-env ./worker.js",
+    "build": "babel --out-dir ./dist --presets @babel/preset-env",
     "dev": "nodemon --exec babel-node --presets @babel/preset-env",
     "test": "./node_modules/.bin/mocha --require @babel/register --exit",
     "test-all": "./node_modules/.bin/mocha --require @babel/register --exit tests"
