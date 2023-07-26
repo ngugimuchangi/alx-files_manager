@@ -47,7 +47,7 @@ Environment variables you can adjust when running the express server
 ## Documentation
 
 The API's documentation is available at
-[here](ngugimuchangi.me/alx-files_manager/)
+[here](https://ngugimuchangi.me/alx-files_manager/)
 
 ## Tests
 
