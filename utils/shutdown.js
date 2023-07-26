@@ -1,3 +1,4 @@
+/* eslint no-console: off */
 import dbClient from './db';
 import redisClient from './redis';
 
