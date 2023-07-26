@@ -25,7 +25,6 @@ class FilesController {
     try {
       fileDocument = await FilesCollection.createFile({ ...req.body, userId });
     } catch (err) {
-      console.log(err.message);
       res.status(400).json({ error: err.message });
       return;
     }
