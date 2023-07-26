@@ -32,6 +32,22 @@ class DBClient {
     return collection;
   }
 
+  async nbUsers() {
+    const usersCollection = this.getCollection('users');
+    const numberOfUsers = await usersCollection.countDocuments();
+    return numberOfUsers;
+  }
+
+  /**
+   * Queries 'files' collection
+   * @returns {number} - number of documents in files collection
+   */
+  async nbFiles() {
+    const filesCollection = this.getCollection('files');
+    const numberOfFiles = filesCollection.countDocuments();
+    return numberOfFiles;
+  }
+
   /**
    * Closes connection to mongodb client
    */
