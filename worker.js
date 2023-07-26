@@ -1,3 +1,4 @@
+/* eslint no-console: off */
 import Queue from 'bull';
 import { ObjectId } from 'mongodb';
 import imageThumbnail from 'image-thumbnail';
