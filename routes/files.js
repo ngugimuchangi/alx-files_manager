@@ -3,7 +3,7 @@ import FilesController from '../controllers/FilesController';
 import authenticateToken from '../middleware/auth';
 
 const filesRouter = Router();
-filesRouter.use(authenticateToken);
+filesRouter.use('^(?!.*/files/:id/data)', authenticateToken);
 
 /**
  * @apiDefine XToken
