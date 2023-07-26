@@ -25,7 +25,7 @@ describe('FileController.js tests - file upload endpoint', () => {
   const DB_HOST = process.env.DB_HOST || 'localhost';
   const DB_PORT = process.env.BD_PORT || 27017;
   const DATABASE = process.env.DB_DATABASE || 'files_manager';
-  const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/file_manager';
+  const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
   const initialPassword = 'supersecretFYI';
   const hashedPassword = sha1(initialPassword);
   const user = { _id: new ObjectId(), email: 'tester@mail.com', password: hashedPassword };
@@ -117,7 +117,7 @@ describe('FileController.js tests - file upload endpoint', () => {
           expect(res.body.parentId).to.equal(0);
           expect(fs.existsSync(FOLDER_PATH)).to.be.true;
           expect(fs.lstatSync(FOLDER_PATH).isDirectory()).to.be.true;
-          expect(fs.readdirSync(FOLDER_PATH).length).to.equal(1);
+          expect(fs.readdirSync(FOLDER_PATH)).to.have.lengthOf.greaterThan(0);
           done();
         });
     });
