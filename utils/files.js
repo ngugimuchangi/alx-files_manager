@@ -34,9 +34,13 @@ class FilesCollection {
 
     // Store folder details in db
     const fileDocument = { ...fileData, parentId };
-    if (type !== 'folder') fileDocument.localPath = path.join(FILES_DIR, v4());
+    if (type !== 'folder') {
+      fileDocument.localPath = path.join(FILES_DIR, v4());
+      delete fileDocument.data;
+    }
     const fileId = (await collection.insertOne(fileDocument)).insertedId;
     fileDocument._id = fileId;
+    if (type !== 'folder') fileDocument.data = data;
     return fileDocument;
   }
 
