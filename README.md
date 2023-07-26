@@ -1,5 +1,10 @@
 # 0x04. Files manager
 
+![Statements](https://img.shields.io/badge/statements-90.69%25-brightgreen.svg?style=flat)
+![Branches](https://img.shields.io/badge/branches-81.76%25-yellow.svg?style=flat)
+![Functions](https://img.shields.io/badge/functions-88.52%25-yellow.svg?style=flat)
+![Lines](https://img.shields.io/badge/lines-90.99%25-brightgreen.svg?style=flat)
+
 Simple file management API that allows users to:
 
 - Upload files
