@@ -4,6 +4,8 @@ import Queue from 'bull';
 import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
 import FilesCollection from '../utils/files';
+import AuthTokenHandler from '../utils/tokens';
+import UsersCollection from '../utils/users';
 import formatFileDocument from '../utils/format';
 
 // Thumbnail generating queue
@@ -144,7 +146,12 @@ class FilesController {
    */
   static async getFile(req, res) {
     const IMG_SIZES = ['500', '250', '100'];
-    const userId = req.user._id.toString();
+    const token = req.get('X-Token');
+    const userId = await AuthTokenHandler.getUserByToken(token);
+    const user = await UsersCollection.getUser({
+      _id: ObjectId.isValid(userId)
+        ? ObjectId(userId) : userId,
+    });
     const { id } = req.params;
     const { size } = req.query;
     const _id = ObjectId.isValid(id) ? new ObjectId(id) : id;
@@ -153,7 +160,7 @@ class FilesController {
       res.status(404).json({ error: 'Not found' });
       return;
     }
-    if (!fileDocument.isPublic && !userId) {
+    if (!fileDocument.isPublic && !user) {
       res.status(404).json({ error: 'Not found' });
       return;
     }
