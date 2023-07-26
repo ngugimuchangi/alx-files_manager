@@ -3,7 +3,10 @@ import FilesController from '../controllers/FilesController';
 import authenticateToken from '../middleware/auth';
 
 const filesRouter = Router();
-filesRouter.use('^(?!.*/files/:id/data)', authenticateToken);
+
+// TO DO: Exclude middleware from GET /files/:id/data
+// filesRouter.use(['/files', 'files/:id', 'files/:id/publish',
+// 'files/:id/unpublish'], authenticateToken); */
 
 /**
  * @apiDefine XToken
@@ -50,7 +53,7 @@ filesRouter.use('^(?!.*/files/:id/data)', authenticateToken);
  * @apiError MissingFileType File type is absent
  * @apiError MissingFileData File data is missing. Applicable to uploads of type `file` and `image`
  */
-filesRouter.post('/files', FilesController.postUpload);
+filesRouter.post('/files', authenticateToken, FilesController.postUpload);
 
 /**
  * @api {get} /files/:id Get file details
@@ -73,7 +76,7 @@ filesRouter.post('/files', FilesController.postUpload);
  *    "isPublic": false
  *  }
  */
-filesRouter.get('/files/:id', FilesController.getShow);
+filesRouter.get('/files/:id', authenticateToken, FilesController.getShow);
 
 /**
  * @api {get} /files Get user's files
@@ -113,7 +116,7 @@ filesRouter.get('/files/:id', FilesController.getShow);
  *    }
  *  ]
  */
-filesRouter.get('/files', FilesController.getIndex);
+filesRouter.get('/files', authenticateToken, FilesController.getIndex);
 
 /**
  * @api {put} /files/:id Publish a file
@@ -136,7 +139,7 @@ filesRouter.get('/files', FilesController.getIndex);
  *    "isPublic": true
  *  }
  */
-filesRouter.put('/files/:id/publish', FilesController.putPublish);
+filesRouter.put('/files/:id/publish', authenticateToken, FilesController.putPublish);
 
 /**
  * @api {put} /files/:id Unpublish a file
@@ -159,7 +162,7 @@ filesRouter.put('/files/:id/publish', FilesController.putPublish);
  *    "isPublic": false
  *  }
  */
-filesRouter.put('/files/:id/unpublish', FilesController.putUnpublish);
+filesRouter.put('/files/:id/unpublish', authenticateToken, FilesController.putUnpublish);
 
 /**
  * @api {put} /files/:id/data Gets file data
