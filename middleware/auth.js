@@ -9,6 +9,10 @@ import UsersCollection from '../utils/users';
  * @param {import('express').NextFunction} next - Next function
  */
 async function authenticateToken(req, res, next) {
+  const { method, path } = req.method;
+  // Exclude GET /files/:id/data from authentication
+  if (method === 'GET' && path.toLowerCase().match(/\/files\/.*\/data\/?/)) return next();
+
   const token = req.get('X-Token');
   let userId = await AuthTokenHandler.getUserByToken(token);
 
