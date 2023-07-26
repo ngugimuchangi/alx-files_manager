@@ -1,5 +1,4 @@
 import dbClient from '../utils/db';
-import Stats from '../utils/stats';
 import redisClient from '../utils/redis';
 
 class AppController {
@@ -26,8 +25,8 @@ class AppController {
    */
   static async getStats(_req, res, next) {
     try {
-      const users = await Stats.nbUsers();
-      const files = await Stats.nbFiles();
+      const users = await dbClient.nbUsers();
+      const files = await dbClient.nbFiles();
       res.status(200).json({ users, files });
     } catch (err) {
       next(err);
