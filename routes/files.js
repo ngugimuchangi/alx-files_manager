@@ -4,7 +4,10 @@ import authenticateToken from '../middleware/auth';
 
 const filesRouter = Router();
 
-// TO DO: Exclude middleware from GET /files/:id/data
+// GET /files/:id/data is excluded from this middleware
+// It uses a different authentication approach since it
+// response unauthorized access differs from the rest of the
+// files routes
 filesRouter.use(authenticateToken);
 
 /**
