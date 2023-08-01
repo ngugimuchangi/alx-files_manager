@@ -10,9 +10,9 @@
     "start-worker": "nodemon --exec babel-node --presets @babel/preset-env ./worker.js",
     "dev": "nodemon --exec babel-node --presets @babel/preset-env",
     "test": "./node_modules/.bin/mocha --require @babel/register --exit",
+    "test-all": "./node_modules/.bin/mocha --require @babel/register --exit tests",
     "coverage": "./node_modules/.bin/nyc --reporter=json-summary ./node_modules/.bin/mocha --require @babel/register --exit",
-    "make-badges": "istanbul-badges-readme --coverageDir=coverage",
-    "test-all": "./node_modules/.bin/mocha --require @babel/register --exit tests"
+    "make-badges": "istanbul-badges-readme --coverageDir=coverage"
   },
   "author": "Duncan Ngugi",
   "contributors": [
@@ -51,7 +51,6 @@
   },
   "apidoc": {
     "name": "File Manager API",
-    "description": "Documentation of File Manager API",
     "title": "FIle Manager API",
     "url": "http://127.0.0.1:5000",
     "header": {
