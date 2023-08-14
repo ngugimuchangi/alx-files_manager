@@ -1,7 +1,6 @@
 /* eslint no-console: off */
 import Queue from 'bull';
 import { ObjectId } from 'mongodb';
-import imageThumbnail from 'image-thumbnail';
 import generateThumbnail from './utils/thumbnails';
 import UsersCollection from './utils/users';
 import FilesCollection from './utils/files';
@@ -22,14 +21,12 @@ fileQueue.process(10, async (job) => {
   const file = await FilesCollection.getFile({ _id, userId: _userId });
   const { localPath } = file;
 
-  // Check if file exists in db and local storage
+  // Check if file exists in db
   if (!file) throw new Error('File not found');
 
   // Create thumbnails and store them in local storage
-  const thumbnail100 = generateThumbnail(localPath, 100);
-  const thumbnail250 = imageThumbnail(localPath, 250);
-  const thumbnail500 = imageThumbnail(localPath, 500);
-  await Promise.all([thumbnail100, thumbnail250, thumbnail500]);
+  await generateThumbnail(localPath);
+
   return Promise.resolve(`Thumbnails for ${file.name} created successfully.`);
 });
 
